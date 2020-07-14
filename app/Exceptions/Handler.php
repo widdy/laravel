@@ -2,11 +2,7 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Validation\ValidationException;
-use Throwable;
 
 class Handler extends ExceptionHandler
 {
@@ -30,44 +26,12 @@ class Handler extends ExceptionHandler
     ];
 
     /**
-     * Report or log an exception.
+     * Register the exception handling callbacks for the application.
      *
-     * @param  \Throwable  $exception
      * @return void
-     *
-     * @throws \Exception
      */
-    public function report(Throwable $exception)
+    public function register()
     {
-        parent::report($exception);
-    }
-
-    /**
-     * Render an exception into an HTTP response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $exception
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
-     *
-     * @throws \Throwable
-     */
-    public function render($request, Throwable $exception)
-    {
-        if (!config('app.debug')) {
-            if ($request->expectsJson()) {
-                $message = 'error code '.$exception->getLine();
-
-                if ($exception instanceof AuthenticationException) {
-                    return Response::unauthenticated('unauthenticated');
-                } elseif ($exception instanceof ValidationException) {
-                    return Response::bad('illegal parameters');
-                }
-
-                return Response::bad($message);
-            } else {
-                return redirect('/');
-            }
-        }
-        return parent::render($request, $exception);
+        //
     }
 }
