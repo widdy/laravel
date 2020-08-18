@@ -2,7 +2,10 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -44,12 +47,27 @@ class Handler extends ExceptionHandler
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Throwable  $exception
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      *
      * @throws \Throwable
      */
     public function render($request, Throwable $exception)
     {
+        if (!config('app.debug')) {
+            if ($request->expectsJson()) {
+                $message = 'error code '.$exception->getLine();
+
+                if ($exception instanceof AuthenticationException) {
+                    return Response::unauthenticated('unauthenticated');
+                } elseif ($exception instanceof ValidationException) {
+                    return Response::bad('illegal parameters');
+                }
+
+                return Response::bad($message);
+            } else {
+                return redirect('/');
+            }
+        }
         return parent::render($request, $exception);
     }
 }
